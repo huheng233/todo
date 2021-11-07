@@ -17,8 +17,20 @@ defmodule LiveViewTodoWeb.PageLive do
     {:noreply,socket}
   end
 
+  @impl true
+  def handle_event("toggle",data,socket) do
+    status = if Map.has_key?(data,"value"),do: 1,else: 0
+    item = Item.get_item!(Map.get(data,"id"))
+    Item.update_item(item,%{id: item.id,status: status})
+    socket = assign(socket,items: Item.list_items(),active: %Item{})
+    LiveViewTodoWeb.Endpoint.broadcast_from(self(),@topic,"update",socket.assigns)
+    {:noreply,socket}
+
+  end
+
   def checked?(item) do
-    is_nil(item.status) and item.status>0
+    not is_nil(item.status)
+    and item.status>0
   end
 
   def completed?(item) do
