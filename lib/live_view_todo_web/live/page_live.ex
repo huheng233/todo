@@ -28,6 +28,15 @@ defmodule LiveViewTodoWeb.PageLive do
 
   end
 
+  @impl true
+
+def handle_event("delete",data,socket) do
+  Map.get(data,"id") |> Item.delete_item()
+  socket = socket |> assign(items: Item.list_items(),active: %Item{})
+  LiveViewTodoWeb.Endpoint.broadcast_from(self(),@topic,"update",socket.assigns)
+  {:noreply,socket}
+end
+
   def checked?(item) do
     not is_nil(item.status)
     and item.status>0
