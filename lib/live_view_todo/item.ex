@@ -4,7 +4,6 @@ defmodule LiveViewTodo.Item do
   alias LiveViewTodo.Repo
   alias __MODULE__
 
-
   schema "items" do
     field :person_id, :integer
     field :status, :integer, default: 0
@@ -23,7 +22,7 @@ defmodule LiveViewTodo.Item do
   @doc """
   Creates a item.
 
-## Examples
+  ## Examples
 
     iex> create_item(%{text: "Learn LiveView"})
     {:ok, %Item{}}
@@ -31,18 +30,18 @@ defmodule LiveViewTodo.Item do
     iex> create_item(%{text: nil})
     {:error, %Ecto.Changeset{}}
   """
-  def  create_item(attrs\\%{})do
+  def create_item(attrs \\ %{}) do
     %Item{}
-    |>changeset(attrs)
-    |>Repo.insert()
+    |> changeset(attrs)
+    |> Repo.insert()
   end
 
   @doc """
   Gets a single item.
 
-Raises `Ecto.NoResultsError` if the Item does not exist.
+  Raises `Ecto.NoResultsError` if the Item does not exist.
 
-## Examples
+  ## Examples
 
     iex> get_item!(123)
     %Item{}
@@ -50,12 +49,12 @@ Raises `Ecto.NoResultsError` if the Item does not exist.
     iex> get_item!(456)
     ** (Ecto.NoResultsError)
   """
-  def get_item!(id),do: Repo.get!(Item,id)
+  def get_item!(id), do: Repo.get!(Item, id)
 
   @doc """
   Returns the list of items.
 
-## Examples
+  ## Examples
 
     iex> list_items()
     [%Item{}, ...]
@@ -64,16 +63,15 @@ Raises `Ecto.NoResultsError` if the Item does not exist.
     Repo.all(Item)
   end
 
-def update_item(%Item{}=item,attrs) do
-  item
-  |>Item.changeset(attrs)
-  |>Repo.update()
-end
+  def update_item(%Item{} = item, attrs) do
+    item
+    |> Item.changeset(attrs)
+    |> Repo.update()
+  end
 
-def delete_item(id) do
-  get_item!(id)
-  |>Item.changeset(%{status: 2})
-  |>Repo.update()
-end
-
+  def delete_item(id) do
+    get_item!(id)
+    |> Item.changeset(%{status: 2})
+    |> Repo.update()
+  end
 end
