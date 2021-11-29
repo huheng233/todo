@@ -7,13 +7,15 @@ defmodule LiveViewTodoWeb.PageLive do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket), do: LiveViewTodoWeb.Endpoint.subscribe(@topic)
-    {:ok, assign(socket, items: Item.list_items())}
+    # if connected?(socket), do: Phoenix.PubSub.subscribe(LiveViewTodo.PubSub, @topic)
+    {:ok, assign(socket, items: list_items())}
   end
 
   def handle_event("create", %{"text" => text}, socket) do
     Item.create_item(%{text: text})
-    socket = assign(socket, items: Item.list_items(), active: %Item{})
+    socket = assign(socket, items: list_items(), active: %Item{})
     LiveViewTodoWeb.Endpoint.broadcast_from(self(), @topic, "update", socket.assigns)
+    # Phoenix.PubSub.broadcast(LiveViewTodo.PubSub, @topic, {:add_item, socket.assigns.items})
     {:noreply, socket}
   end
 
@@ -22,7 +24,7 @@ defmodule LiveViewTodoWeb.PageLive do
     status = if Map.has_key?(data, "value"), do: 1, else: 0
     item = Item.get_item!(Map.get(data, "id"))
     Item.update_item(item, %{id: item.id, status: status})
-    socket = assign(socket, items: Item.list_items(), active: %Item{})
+    socket = assign(socket, items: list_items(), active: %Item{})
     LiveViewTodoWeb.Endpoint.broadcast_from(self(), @topic, "update", socket.assigns)
     {:noreply, socket}
   end
@@ -31,9 +33,14 @@ defmodule LiveViewTodoWeb.PageLive do
 
   def handle_event("delete", data, socket) do
     Map.get(data, "id") |> Item.delete_item()
-    socket = socket |> assign(items: Item.list_items(), active: %Item{})
+    socket = socket |> assign(items: list_items(), active: %Item{})
     LiveViewTodoWeb.Endpoint.broadcast_from(self(), @topic, "update", socket.assigns)
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info(data, socket) do
+    {:noreply, assign(socket, :items, data.payload.items)}
   end
 
   def checked?(item) do
@@ -44,4 +51,14 @@ defmodule LiveViewTodoWeb.PageLive do
   def completed?(item) do
     if not is_nil(item.status) and item.status > 0, do: "completed", else: ""
   end
+
+  def list_items do
+    Item.list_items()
+    |>Enum.filter( fn %{status: status} ->
+      status != 2
+    end)
+
+  end
+
+
 end
