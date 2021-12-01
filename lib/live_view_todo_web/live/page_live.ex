@@ -43,14 +43,9 @@ defmodule LiveViewTodoWeb.PageLive do
     {:noreply, assign(socket, :items, data.payload.items)}
   end
 
-  def checked?(item) do
-    not is_nil(item.status) and
-      item.status > 0
-  end
 
-  def completed?(item) do
-    if not is_nil(item.status) and item.status > 0, do: "completed", else: ""
-  end
+
+
 
   def list_items do
     Item.list_items()
