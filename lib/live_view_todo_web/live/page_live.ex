@@ -43,17 +43,10 @@ defmodule LiveViewTodoWeb.PageLive do
     {:noreply, assign(socket, :items, data.payload.items)}
   end
 
-
-
-
-
   def list_items do
     Item.list_items()
-    |>Enum.filter( fn %{status: status} ->
+    |> Enum.filter(fn %{status: status} ->
       status != 2
     end)
-
   end
-
-
 end
