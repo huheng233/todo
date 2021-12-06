@@ -6,12 +6,14 @@ defmodule LiveViewTodoWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    # IO.inspect(connected?(socket),label: "------------mount------------")
     if connected?(socket), do: LiveViewTodoWeb.Endpoint.subscribe(@topic)
     # if connected?(socket), do: Phoenix.PubSub.subscribe(LiveViewTodo.PubSub, @topic)
     {:ok, assign(socket, items: list_items())}
   end
 
   def handle_event("create", %{"text" => text}, socket) do
+    # IO.inspect("", label: "++++create++++")
     Item.create_item(%{text: text})
     socket = assign(socket, items: list_items(), active: %Item{})
     LiveViewTodoWeb.Endpoint.broadcast_from(self(), @topic, "update", socket.assigns)
@@ -40,6 +42,7 @@ defmodule LiveViewTodoWeb.PageLive do
 
   @impl true
   def handle_info(data, socket) do
+    # IO.inspect("", label: "++++handle_info++++")
     {:noreply, assign(socket, :items, data.payload.items)}
   end
 
